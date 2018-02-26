@@ -34,6 +34,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.hardware.fingerprint.FingerprintManager;
 
 import com.android.settings.R;
 import com.android.settings.SettingsPreferenceFragment;
@@ -45,59 +46,81 @@ import com.android.internal.logging.nano.MetricsProto;
  * Created by cedwards on 6/3/2016.
  */
 public class LockscreenFrag extends SettingsPreferenceFragment implements
-        Preference.OnPreferenceChangeListener {
+Preference.OnPreferenceChangeListener {
 
-    private static final String PREF_LOCKSCREEN_SHORTCUTS_LAUNCH_TYPE =
-            "lockscreen_shortcuts_launch_type";
+	private static final String PREF_LOCKSCREEN_SHORTCUTS_LAUNCH_TYPE =
+		"lockscreen_shortcuts_launch_type";
 
-    private ListPreference mLockscreenShortcutsLaunchType;
+	private ListPreference mLockscreenShortcutsLaunchType;
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        addPreferencesFromResource(R.xml.lockscreen_frag);
+	private static final String FP_UNLOCK_KEYSTORE = "fp_unlock_keystore";
+	private FingerprintManager mFingerprintManager;
+	private SwitchPreference mFpKeystore;
 
-        final ContentResolver resolver = getContentResolver();
-        final PreferenceScreen prefScreen = getPreferenceScreen();
-        final Resources res = getResources();
+	@Override
+		public void onCreate(Bundle savedInstanceState) {
+			super.onCreate(savedInstanceState);
+			addPreferencesFromResource(R.xml.lockscreen_frag);
 
-        mLockscreenShortcutsLaunchType = (ListPreference) findPreference(
-                PREF_LOCKSCREEN_SHORTCUTS_LAUNCH_TYPE);
-        mLockscreenShortcutsLaunchType.setOnPreferenceChangeListener(this);
-        setHasOptionsMenu(false);
+			final ContentResolver resolver = getContentResolver();
+			final PreferenceScreen prefScreen = getPreferenceScreen();
+			final Resources res = getResources();
 
-    }
+			mLockscreenShortcutsLaunchType = (ListPreference) findPreference(
+					PREF_LOCKSCREEN_SHORTCUTS_LAUNCH_TYPE);
+			mLockscreenShortcutsLaunchType.setOnPreferenceChangeListener(this);
+			setHasOptionsMenu(false);
 
-    @Override
-    public View onCreateView(LayoutInflater inflater,
-            ViewGroup container, Bundle savedInstanceState) {
-        final View view = super.onCreateView(inflater, container, savedInstanceState);
-        final ListView list = (ListView) view.findViewById(android.R.id.list);
-        // our container already takes care of the padding
-        if (list != null) {
-            int paddingTop = list.getPaddingTop();
-            int paddingBottom = list.getPaddingBottom();
-            list.setPadding(0, paddingTop, 0, paddingBottom);
-        }
-        return view;
-    }
+			PreferenceScreen prefSet = getPreferenceScreen();
 
-    @Override
-    public boolean onPreferenceChange(Preference preference, Object newValue) {
-        if (preference == mLockscreenShortcutsLaunchType) {
-            Settings.System.putInt(getContentResolver(),
-                    Settings.System.LOCKSCREEN_SHORTCUTS_LONGPRESS,
-                    Integer.valueOf((String) newValue));
-        return true;
-        }
-        return false;
-    }
+			mFingerprintManager = (FingerprintManager) getActivity().getSystemService(Context.FINGERPRINT_SERVICE);
+			mFpKeystore = (SwitchPreference) findPreference(FP_UNLOCK_KEYSTORE);
+			if (!mFingerprintManager.isHardwareDetected()){
+				prefSet.removePreference(mFpKeystore);
+			} else {
+				mFpKeystore.setChecked((Settings.System.getInt(resolver,
+								Settings.System.FP_UNLOCK_KEYSTORE, 0) == 1));
+				mFpKeystore.setOnPreferenceChangeListener(this);
+			}
+
+		}
+
+	@Override
+		public View onCreateView(LayoutInflater inflater,
+				ViewGroup container, Bundle savedInstanceState) {
+			final View view = super.onCreateView(inflater, container, savedInstanceState);
+			final ListView list = (ListView) view.findViewById(android.R.id.list);
+			// our container already takes care of the padding
+			if (list != null) {
+				int paddingTop = list.getPaddingTop();
+				int paddingBottom = list.getPaddingBottom();
+				list.setPadding(0, paddingTop, 0, paddingBottom);
+			}
+			return view;
+		}
+
+	@Override
+		public boolean onPreferenceChange(Preference preference, Object newValue) {
+			if (preference == mLockscreenShortcutsLaunchType) {
+				Settings.System.putInt(getContentResolver(),
+						Settings.System.LOCKSCREEN_SHORTCUTS_LONGPRESS,
+						Integer.valueOf((String) newValue));
+				return true;
+			}
+			if (preference == mFpKeystore) {
+				boolean value = (Boolean) newValue;
+				Settings.System.putInt(getContentResolver(),
+						Settings.System.FP_UNLOCK_KEYSTORE, value ? 1 : 0);
+				return true;
+			}
+			return false;
+		}
 
 
-    @Override
-    public int getMetricsCategory() {
-        return MetricsProto.MetricsEvent.SCREWD;
-    }
+	@Override
+		public int getMetricsCategory() {
+			return MetricsProto.MetricsEvent.SCREWD;
+		}
 
 
 }
