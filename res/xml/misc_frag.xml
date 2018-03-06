@@ -39,4 +39,10 @@
         android:summary="@string/custom_summary_randomize_explain"
         android:defaultValue="false" />
 
+     <com.mrapocalypse.screwdshop.prefs.SystemSettingSwitchPreference
+        android:key="three_finger_gesture"
+        android:title="@string/three_finger_gesture_title"
+        android:summary="@string/three_finger_gesture_summary"
+        android:defaultValue="false" /> 
+        
 </PreferenceScreen>

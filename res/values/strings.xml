@@ -1257,6 +1257,10 @@
     <string name="qs_set_animation_style">%1$s</string>
     <string name="qs_set_animation_duration">%1$s</string>
     <string name="qs_set_animation_interpolator">%1$s</string>
+    
+    <!-- Three finger gesture  -->
+    <string name="three_finger_gesture_title">Swipe to screenshot</string>
+    <string name="three_finger_gesture_summary">Swipe with three fingers to screenshot</string>
 
     <!-- QuickSettings Panel Transparency -->
     <string name="qs_panel_alpha_title">QS Panel Transparency</string>
