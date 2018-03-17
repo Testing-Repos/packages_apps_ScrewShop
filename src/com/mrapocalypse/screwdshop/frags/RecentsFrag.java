@@ -66,6 +66,7 @@ import com.android.settings.R;
 import com.android.settings.SettingsPreferenceFragment;
 import com.android.settings.Utils;
 
+
 import com.android.internal.logging.nano.MetricsProto;
 
 public class RecentsFrag extends SettingsPreferenceFragment implements
@@ -90,6 +91,8 @@ public class RecentsFrag extends SettingsPreferenceFragment implements
     private ListPreference mImmersiveRecents;
     private SwitchPreference mSlimToggle;
     private Preference mStockIconPacks;
+ 		private ListPreference mRecentsType;
+    private static final String RECENTS_TYPE = "recents_layout_style";
 
     private AlertDialog mDialog;
     private ListView mListView;
@@ -111,6 +114,14 @@ public class RecentsFrag extends SettingsPreferenceFragment implements
         mRecentsClearAllLocation.setSummary(mRecentsClearAllLocation.getEntry());
         mRecentsClearAllLocation.setOnPreferenceChangeListener(this);
 
+        // recents type
+        mRecentsType = (ListPreference) findPreference(RECENTS_TYPE);
+        int style = Settings.System.getIntForUser(resolver,
+                Settings.System.RECENTS_LAYOUT_STYLE, 0, UserHandle.USER_CURRENT);
+        mRecentsType.setValue(String.valueOf(style));
+        mRecentsType.setSummary(mRecentsType.getEntry());
+				mRecentsType.setOnPreferenceChangeListener(this);
+
         mImmersiveRecents = (ListPreference) findPreference(IMMERSIVE_RECENTS);
         mImmersiveRecents.setValue(String.valueOf(Settings.System.getInt(
                 resolver, Settings.System.IMMERSIVE_RECENTS, 0)));
@@ -125,6 +136,8 @@ public class RecentsFrag extends SettingsPreferenceFragment implements
         mSlimToggle.setChecked(enabled);
         mStockIconPacks.setEnabled(!enabled);
         mSlimToggle.setOnPreferenceChangeListener(this);
+
+				
 
     }
 
@@ -152,7 +165,15 @@ public class RecentsFrag extends SettingsPreferenceFragment implements
             mSlimToggle.setChecked(value);
             mStockIconPacks.setEnabled(!value);
             return true;
-        }
+        } else if (preference == mRecentsType) {
+            int style = Integer.valueOf((String) newValue);
+            int index = mRecentsType.findIndexOfValue((String) newValue);
+            Settings.System.putIntForUser(getActivity().getContentResolver(),
+                    Settings.System.RECENTS_LAYOUT_STYLE, style, UserHandle.USER_CURRENT);
+            mRecentsType.setSummary(mRecentsType.getEntries()[index]);
+            com.mrapocalypse.screwdshop.util.Utils.restartSystemUi(getContext());
+        		return true;
+				}
         return false;
     }
 

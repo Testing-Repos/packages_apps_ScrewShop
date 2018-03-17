@@ -29,6 +29,14 @@
              android:title="@string/aosp_recents_title"
              android:key="stock_recents" >
 
+						<ListPreference
+        				android:key="recents_layout_style"
+        				android:title="@string/recents_type_title"
+        				android:dialogTitle="@string/recents_type_title"
+        				android:entries="@array/recents_type_title_entries"
+        				android:defaultValue="0"
+								android:entryValues="@array/recents_type_title_values"/>
+
             <Preference
                 android:key="recents_icon_pack"
                 android:title="@string/recents_icon_pack_title"
