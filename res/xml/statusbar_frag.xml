@@ -198,5 +198,17 @@
             android:defaultValue="1" />
 
     </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="pref_cat_stat_misc"
+        android:title="@string/misc">
+
+        <com.mrapocalypse.screwdshop.prefs.SecureSettingSwitchPreference                   
+            android:key="toggle_confirm_dlg"
+            android:title="@string/cellular_data_off_confirm_toggle_title"
+            android:summary="@string/cellular_data_off_confirm_toggle_summary"
+            android:persistent="false" />
+     
+     </PreferenceCategory> 
     
 </PreferenceScreen>

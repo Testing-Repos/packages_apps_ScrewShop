@@ -1283,5 +1283,9 @@
     <string name="recents_grid">Grid</string>
 		<string name="recents_go">Android Go</string>    
     
+    <!-- Toggle cellular data turning off confirmation dialog-->
+    <string name="cellular_data_off_confirm_toggle_title">Cellular data turn off confirmation</string>
+    <string name="cellular_data_off_confirm_toggle_summary">Do not show the confirmation dialog while turning off cellular data from QS</string>
+    
 </resources>
 

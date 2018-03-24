@@ -73,6 +73,7 @@ public class StatusbarFrag extends SettingsPreferenceFragment implements
     private static final String CLOCK_DATE_POSITION = "clock_date_position";
     private static final String BATTERY_STYLE = "battery_style";
     private static final String BATTERY_PERCENT = "show_battery_percent";
+    private static final String TOGGLE_CONFIRM_DLG = "toggle_confirm_dlg";
 
     public static final int CLOCK_DATE_STYLE_LOWERCASE = 1;
     public static final int CLOCK_DATE_STYLE_UPPERCASE = 2;
@@ -94,6 +95,7 @@ public class StatusbarFrag extends SettingsPreferenceFragment implements
     private ListPreference mClockDatePosition;
     private ListPreference mBatteryIconStyle;
     private ListPreference mBatteryPercentage;
+    private SwitchPreference mToggleConfirmDlg;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -208,6 +210,12 @@ public class StatusbarFrag extends SettingsPreferenceFragment implements
         mBatteryPercentage.setOnPreferenceChangeListener(this);
         boolean hideForcePercentage = batteryStyle == 7 || batteryStyle == 8; /*text or hidden style*/
         mBatteryPercentage.setEnabled(!hideForcePercentage);
+        
+        mToggleConfirmDlg = (SwitchPreference) findPreference(TOGGLE_CONFIRM_DLG);
+        mToggleConfirmDlg.setChecked((Settings.System.getInt(resolver, 
+                Settings.System.TOGGLE_CONFIRM_DLG, 0) == 1));
+        mToggleConfirmDlg.setOnPreferenceChangeListener(this);
+
     }
 
     private void updateCustomLabelTextSummary() {
@@ -373,6 +381,11 @@ public class StatusbarFrag extends SettingsPreferenceFragment implements
                     .findIndexOfValue((String) newValue);
             mBatteryPercentage
                     .setSummary(mBatteryPercentage.getEntries()[valueIndex]);
+            return true;
+        } else if (preference == mToggleConfirmDlg) {
+            boolean value = (Boolean) newValue;
+            Settings.System.putInt(getActivity().getContentResolver(),
+                            Settings.System.TOGGLE_CONFIRM_DLG, value ? 1 : 0);
             return true;
         }
         return false;
